@@ -1,0 +1,93 @@
+# begin execution at address zero
+        .pos    0
+        irmovq  stack, %rsp     # set stack to 0xFF8, grow to lower addresses
+        call    main            # start main
+        halt                    # done
+
+# set up array, length, followed by data
+        .align  8
+count:
+        .quad   0x0A
+array:
+        .quad   0x0FFF
+        .quad   0x0F20
+        .quad   0xFFFFFFFFFFFFFF45
+        .quad   0xFFFFFFFFFFFFFFFF
+        .quad   0x01
+        .quad   0x03
+        .quad   0x04
+        .quad   0x0A
+        .quad   0x09
+        .quad   0x11
+
+main:
+        irmovq  array, %rdi
+        irmovq  count, %rax
+        mrmovq  (%rax), %rsi
+        call    sort
+        ret
+
+# void sort(long *data, long count)
+# data in %rdi, count in %rsi
+sort:
+LFB0:
+	#%rsi is count
+	#%rsi is also last
+	#%rax is i
+	#%rdx is t
+	irmovq	$1, %r9		  #constant 1
+	irmovq	$8, %r8		  #constant 8
+	irmovq	$0, %r10 	  #constant 0
+	rrmovq	%rdi, %r11 	  #data
+	subq	%r9, %rsi	  #subtract 1 from count, becomes variable last
+	jmp	L2	
+
+L3:	#inner loop ++i
+	addq	%r9, %rax
+	addq	%r8, %r11
+
+L5:	#inner loop
+	#compares i and last
+	pushq	%rsi
+	subq	%rax, %rsi
+	popq	%rsi
+	jle	L7		#if i>last, increment last -- and go through the first loop again which is L2
+
+	#data[i] is %r13
+	#data[i+1] is %r14
+
+	
+	rrmovq	%r11, %r14	#memory address of data[i]
+	rrmovq	%r11, %r13	#memory address of data[i]
+	addq	%r8, %r14	#becomes memory address of data[i+1]
+	rrmovq	%r14, %r12	#save the memory location of data[i+1] into an unused register
+	mrmovq	(%r11), %rbx	#copy the content of data[i] into rbx
+	mrmovq	8(%r11), %rcx	#copy the content of data[i+1] into rcx
+	rmmovq	%rbx, (%r14)
+	
+	#compares data[i+1] and data[i]
+	pushq	%rbx
+	subq	%rcx, %rbx	#subtracts rbx-rcx->rbx
+	popq	%rbx
+
+	#cmov moves &data[i] into r12(which is already set to &data[i+1] iff dta[i]>data[i+1] 
+	cmovge	%r13, %r12	#only rewrites rbx if it was greater than	
+	rmmovq	%rcx, (%r12)	#copy the content of rbx into data[i+1]
+	jmp	L3    		#jump to increment i and go back through the loop
+	
+L7:	#outer loop "--last"
+	subq	%r9, %rsi
+
+L2:	#outer loop
+	subq	%r10, %rsi	#subtract 0-count, if that is less than 0
+	jle   	L8    		#jump to L8 to kill program
+	irmovq	$0, %rax	#variable i
+	rrmovq	%rdi, %r11	
+	jmp	L5
+	
+L8:
+        ret
+
+# stack starts here
+        .pos    0xFF8
+stack:
