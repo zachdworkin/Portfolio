@@ -1,0 +1,86 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ShipTest {
+
+	public static final double DELTA = 0.001;
+
+	private Ship ship;
+
+	@BeforeEach
+	public void setUp() throws Exception {
+		ship = new Ship(0.5, 0.5, 0.0);
+	}
+
+	@Test
+	public void storesExtent() {
+		Extent e = ship.getExtent();
+		assertEquals(0.5, e.getX(), DELTA);
+		assertEquals(0.5, e.getY(), DELTA);
+		assertEquals(0.025, e.getRadius(), DELTA);		
+	}
+
+	@Test
+	public void drifts() {
+		Extent e = ship.getExtent();
+		ship.accelerate(0.1);
+		ship.drift();
+		assertEquals(0.6, e.getX(), DELTA);
+		assertEquals(0.5, e.getY(), DELTA);
+		// Merely changing the direction the ship is facing should not change
+		// the direction it is drifting
+		ship.rotate(Math.PI / 2);
+		ship.drift();
+		assertEquals(0.7, e.getX(), DELTA);
+		assertEquals(0.5, e.getY(), DELTA);
+	}
+	
+	@Test
+	public void accelerationDoesNotDirectlyMoveShip() {
+		Extent e = ship.getExtent();
+		ship.accelerate(0.1);
+		assertEquals(0.5, e.getX(), DELTA);
+		assertEquals(0.5, e.getY(), DELTA);
+	}
+
+	@Test
+	public void rotationDoesNotChangeDirectionOfDrift() {
+		ship.accelerate(0.1);
+		Extent e = ship.getExtent();
+		ship.drift();
+		// Merely changing the direction the ship is facing should not change
+		// the direction it is drifting
+		ship.rotate(Math.PI / 2);
+		ship.drift();
+		assertEquals(0.7, e.getX(), DELTA);
+		assertEquals(0.5, e.getY(), DELTA);
+	}
+
+	@Test
+	public void wrapsAroundEdgeOfPlayArea() {
+		ship.rotate(Math.PI * 1.0 / 2); // Point north
+		ship.accelerate(0.1);
+		Extent e = ship.getExtent();
+		for (int i = 0; i < 6; i++) {
+			ship.drift();
+		}
+		assertEquals(0.5, e.getX(), DELTA);
+		assertEquals(0.1, e.getY(), DELTA);
+	}
+
+	@Test
+	public void driftsAtAnAngle() {
+		ship.rotate(Math.atan(3.0 / 4) + Math.PI);
+		ship.accelerate(0.5);
+		Extent e = ship.getExtent();
+		ship.drift();
+		assertEquals(0.1, e.getX(), DELTA);
+		assertEquals(0.2, e.getY(), DELTA);
+		ship.drift();
+		assertEquals(0.7, e.getX(), DELTA);
+		assertEquals(0.9, e.getY(), DELTA);
+	}
+
+}
