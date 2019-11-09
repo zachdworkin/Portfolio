@@ -1,0 +1,36 @@
+import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.In;
+public class StronglyConnectedComponents {
+    private int v;
+    private int e;
+    private boolean[] marked;
+
+    public static void main(String[] args) {
+        new StronglyConnectedComponents().run();
+    }
+
+    public void run() {
+        In in = new In("rosalind_scc.txt");
+//        In in = new In("StronglyConnectedComponents.txt");
+        solve(in);
+    }
+
+    private void solve(In in) {
+        Digraph g = readGraph(in);
+        KosarajuSharirSCC ans = new KosarajuSharirSCC(g);
+        StdOut.print(ans.count()-1);
+    }
+
+    private Digraph readGraph(In in) {
+        v=in.readInt()+1;
+        e=in.readInt();
+        marked=new boolean[v];
+        Digraph g = new Digraph(v);
+        for(int i=0; i<e; i++){
+            int p=in.readInt();
+            int q = in.readInt();
+            g.addEdge(p,q);
+        }
+        return g;
+    }
+}
