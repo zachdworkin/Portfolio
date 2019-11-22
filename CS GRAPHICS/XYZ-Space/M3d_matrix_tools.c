@@ -156,7 +156,7 @@ int M3d_mat_mult_pt (double P[3],   double m[4][4], double Q[3])
 // P = m*Q
 // SAFE, user may make a call like M2d_mat_mult_pt (W, m,W) ;
 {
-  double u,v ;
+  double u,v,t ;
 
   u = m[0][0]*Q[0] + m[0][1]*Q[1] + m[0][2]*Q[2] + m[0][3] ;
   v = m[1][0]*Q[0] + m[1][1]*Q[1] + m[1][2]*Q[2] + m[1][3] ;
@@ -173,9 +173,9 @@ int M3d_mat_mult_pt (double P[3],   double m[4][4], double Q[3])
 
 
 
-int M3d_mat_mult_points (double *X, double *Y, double *Z
+int M3d_mat_mult_points (double *X, double *Y, double *Z,
                          double m[4][4],
-                         double *x, double *y, double *z int numpoints)
+                         double *x, double *y, double *z, int numpoints)
 // |X0 X1 X2 ...|       |x0 x1 x2 ...|
 // |Y0 Y1 Y2 ...| = m * |y0 y1 y2 ...|
 // |Z0 Z1 Z2 ...|       |Z0 Z1 Z2 ...|
