@@ -3,7 +3,7 @@
 #include "M3d_matrix_tools.c"
 #include "dot_cross.c"
 #include "vectorTools.c"
-#include "clip_testD.c"
+#include "clip_test3D.c"
 /*
  * 3D Clipping Lab
  */
